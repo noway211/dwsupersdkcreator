@@ -1,0 +1,10 @@
+package $packagename;
+
+/**
+ * @author $author
+ * @Description: 第三方渠道验证登录态的参数实体，具体属性由第三方接口确定
+ * @date $date
+ */
+public class ChannelLoginEntity {
+
+}

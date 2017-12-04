@@ -1,0 +1,10 @@
+package com.duowan.supersdk.channel;
+
+/**
+ * @author $author
+ * @Description: 配置application桥接类的类名
+ * @date $date
+ */
+public class ChannelConfig {
+    public static String App_Config = "com.duowan.supersdk.channel.ThirdSdkApplicationAda";
+}

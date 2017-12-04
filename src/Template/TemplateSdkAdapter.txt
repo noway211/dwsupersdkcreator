@@ -1,0 +1,286 @@
+package $packagename;
+
+import android.app.Activity;
+import android.content.Intent;
+
+import com.duowan.supersdk.channel.AbsChannelSdk;
+import com.duowan.supersdk.entity.SdkGameDataInfo;
+import com.duowan.supersdk.entity.SdkInitInfo;
+import com.duowan.supersdk.entity.SdkInitResult;
+import com.duowan.supersdk.entity.SdkPayOrder;
+import com.duowan.supersdk.http.HttpRequestManager;
+import com.duowan.supersdk.http.ResponseErrorListener;
+import com.duowan.supersdk.http.ResponseListener;
+import com.duowan.supersdk.util.SdkConst;
+import com.duowan.supersdk.yypetersdk.entity.DwInitExtraEntity;
+import com.duowan.supersdk.yypetersdk.entity.NormalDepositEntity;
+
+import java.io.UnsupportedEncodingException;
+
+
+/**
+ * @author $author
+ * @Description: SDK桥接类，接受融合sdk的请求，比如初始化，登录，退出，充值，数据上报等
+ * @date $date
+ */
+public class $classname extends AbsChannelSdk {
+
+    //统一认证的source
+    private final static String CHANNEL_SOURCE = "xxxx";
+    //渠道的初始化参数实体
+    private DwInitExtraEntity mExtraEntity;
+    //预下单的地址
+    private static String DEPOSIT_URL = "http://xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+    /**
+     * 渠道初始化
+     * @param activity
+     * @param info 游戏初始化参数实体
+     * @param result 接口返回渠道初始化参数实体
+     *        流程：1.调用渠道sdk的初始化接口，渠道sdk初始化接口从SdkInitInfo，SdkInitResult中获取
+     *              2.初始化后，调用getListenerMgr().callBackInitListener(），通知融合sdk 渠道初始化成功（SdkConst.SUCCESS_CODE） 或者初始化失败（SdkConst.INIT_FAIL_CODE）
+     */
+    @Override
+    public void init(Activity activity, SdkInitInfo info, SdkInitResult result) {
+        setChannelSource(CHANNEL_SOURCE);
+        if(result != null && result.getData() != null && result.getData().getChannelExtra() != null ) {
+            DwInitExtraEntity extraEntity = gson.fromJson(result.getData().getChannelExtra(), DwInitExtraEntity.class);
+            if(extraEntity != null){
+                setChannelAppId(extraEntity.getAppId());
+                mExtraEntity= extraEntity;
+                //// TODO:$date
+                //添加第三方渠道sdk初始化代码，初始化成功后要调用getListenerMgr().callBackInitListener(xx）
+                // 回调给融合SDK是否初始化成功
+
+            }else{
+                getListenerMgr().callBackInitListener(SdkConst.INIT_FAIL_CODE, "初始化参数获取失败");
+            }
+        }else{
+            getListenerMgr().callBackInitListener(SdkConst.INIT_FAIL_CODE, "初始化参数获取失败");
+        }
+    }
+
+    /**
+     * 游戏登录时调
+     * @param activity
+     * 流程： 1.调用渠道sdk的登录接口（注意部分渠道改接口要在主线程调用），渠道sdk在登录后会有回调接口通知是否成功
+     *        2.接受到登录回调后，如果是登录失败直接调用getListenerMgr().callBackLoginListener(SdkConst.LOGIN_FAIL_CODE,"失败原因")
+     *        3.如果是登录成功，将登录回调的信息转成ChannelLoginEntity实体，具体属性名由统一认证平台根据渠道sdk的接口文档确定。
+     *          再调用bindUserInfo(getChannelSource(),gson.toJson(ChannelLoginEntity))，生成统一认证平台账户
+     */
+    @Override
+    public void login(Activity activity) {
+        //// TODO:$date
+    }
+
+    /**
+     * 游戏退出登录，用户注销时调用
+     * @param activity
+     * 流程：  如果渠道sdk在用户注销接口，就直接调用渠道方的用户注销接口
+     */
+    @Override
+    public void logout(Activity activity) {
+
+    }
+
+    /**
+     * 游戏下单时调
+     * @param activity
+     * @param info
+     *  流程： 1.先通过createOrder进行 预下单，生成预下单订单号
+     *         2.再通过dopay 调用渠道sdk真正的下单接口。主要传给渠道方的订单号，必须是预下单的订单号。
+     */
+    @Override
+    public void pay(Activity activity, SdkPayOrder info) {
+        createOrder(activity,info);
+    }
+
+    /**
+     * 游戏退出时调
+     * @param activity
+     *  流程： 如果渠道sdk有退出接口，就调用渠道sdk的退出接口，在渠道sdk退出成功后，做游戏退出操作，
+     *          比如：activity.finish(),Process.killProcess()
+     *         如果渠道sdk没有退出接口，直接调用 getListenerMgr().callBackExitListener(DwResult.ERR_EXIT_GAME_SELF,"游戏自己退出") 让游戏自己处理退出逻辑
+     */
+    @Override
+    public void exitGame(Activity activity) {
+        //如果sdk有自己的退出,就调sdk的退出接口
+        //如果没有就调getListenerMgr().callBackExitListener(DwResult.ERR_EXIT_GAME_SELF,"游戏自己退出");
+        //// TODO:$date
+    }
+
+    /**
+     * 数据上报时调用
+     * @param activity
+     * @param info
+     * 流程：  数据上报时在游戏用户信息发生变化时调用比如：创角，进入区服，角色等级等， 参考@SdkGameDataInfo
+     */
+    @Override
+    public void colGameData(Activity activity, SdkGameDataInfo info) {
+        //// TODO:$date
+    }
+
+    /**
+     * 第三方渠道的渠道ID
+     * @return
+     */
+    @Override
+    public String getChannelId() {
+        return "xxxx";
+    }
+
+    /**
+     * 第三方渠道的渠道名称
+     * @return
+     */
+    @Override
+    public String getChannelName() {
+        return "xxxx";
+    }
+
+    /**
+     * 渠道的渠道Source
+     * @return
+     */
+    @Override
+    public String getSDKSource() {
+        return "xxxx";
+    }
+
+
+    /**
+     * activity的onResume调用
+     * @param activity
+     */
+    @Override
+    public void onResume(Activity activity) {
+
+    }
+
+    /**
+     * activity的onPause调用
+     * @param activity
+     */
+    @Override
+    public void onPause(Activity activity) {
+
+    }
+
+    /**
+     * activity的onStop调用
+     * @param activity
+     */
+    @Override
+    public void onStop(Activity activity) {
+
+    }
+
+    /**
+     * activity的onNewIntent调用
+     * @param activity
+     */
+    @Override
+    public void onNewIntent(Activity activity, Intent intent) {
+
+    }
+
+    /**
+     * activity的onDestroy调用
+     * @param activity
+     */
+    @Override
+    public void onDestroy(Activity activity) {
+
+    }
+
+    /**
+     * activity的横竖屏切换调用
+     * @param activity
+     */
+    @Override
+    public void changeOrientation(Activity activity, int orientation) {
+
+    }
+
+    /**
+     * activity的onActivityResult切换调用
+     * @param activity
+     */
+    @Override
+    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+
+    }
+
+    /**
+     * activity的onRestart切换调用
+     * @param activity
+     */
+    @Override
+    public void onRestart(Activity activity) {
+
+    }
+
+    /**
+     * 预下单接口
+     * @param activity
+     * @param order
+     */
+    private void createOrder(final Activity activity, final SdkPayOrder order){
+        //创建订单
+        HttpRequestManager.getInstance().submitStringHttpRequest(HttpRequestManager.EMETHOD.POST, createbodydata(order), DEPOSIT_URL, new ResponseListener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        NormalDepositEntity entity = gson.fromJson(response,NormalDepositEntity.class);
+                        if (entity.getStatus() ==200){
+                            dopay(activity,order,entity.getData());
+                        }else {
+                            getListenerMgr().callBackPayListener(SdkConst.PAY_FAIL_CODE,"下单失败");
+                        }
+
+                    }
+                },
+                new ResponseErrorListener() {
+                    @Override
+                    public void onErrorResponse(Exception error) {
+                        getListenerMgr().callBackPayListener(SdkConst.PAY_FAIL_CODE,"下单失败");
+                    }
+                });
+    }
+
+    /**
+     * 预下单接口参数构建：参考http://doc.game.yy.com/pages/viewpage.action?pageId=18809313
+     * @param order
+     * @return
+     */
+    private byte[] createbodydata(SdkPayOrder order){
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("sdkOrderId=").append(order.orderId).append("&");
+        stringBuffer.append("uid=").append(getChannelUid()).append("&");
+        stringBuffer.append("appId=").append(mExtraEntity.getAppId()).append("&");
+        stringBuffer.append("amount=").append(order.amount).append("&");
+        stringBuffer.append("productName=").append(order.itemName).append("&");
+        stringBuffer.append("productDesc=").append(order.itemId+"_"+order.itemName).append("&");
+        stringBuffer.append("serverId=").append(order.serverId).append("&");
+        stringBuffer.append("roleId=").append(order.roleId).append("&");
+        stringBuffer.append("extData=").append(order.remark);
+
+        try {
+            return stringBuffer.toString().getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param activity
+     * @param order
+     * @param newOrderId 预下单的订单号
+     */
+    private void dopay(Activity activity,SdkPayOrder order,String newOrderId){
+            //调用SDK的下单逻辑
+            //// TODO:$date
+    }
+}

@@ -1,0 +1,34 @@
+package com.duowan.supersdk.channel;
+
+import android.content.Context;
+
+import com.duowan.supersdk.core.SdkAppExtraInterface;
+
+/**
+ * @author $author
+ * @Description: 第三方渠道的application代理类，根据渠道要求在application处理，例如初始化等
+ * @date $date
+ */
+public class ThirdSdkApplicationAda implements SdkAppExtraInterface {
+
+    /**
+     *
+     * @param context
+     * 在application的attachBaseContext被调用
+     */
+    @Override
+    public void beforeAppAttach(Context context) {
+
+    }
+
+    /**
+     *
+     * @param context
+     * 在application的onCreate被调用
+     */
+    @Override
+    public void afterAppOnCreate(Context context) {
+
+    }
+
+}
